@@ -37,8 +37,8 @@ class ActivityStatsImpl extends ActivityStats:
 
   def countOverLastActivityWindow(token: Option[String]): Int =
     scheduleResetOnFirstCall
-    slaMap.putIfAbsent(token, initCounter())
-    val state = slaMap.get(token)
+    lazy val zero = initCounter()
+    val state = Option(slaMap.putIfAbsent(token, zero)).getOrElse(zero)
     state.incrementAndGet()
 
   def close(): Unit = scala.util.Try {

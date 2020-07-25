@@ -4,3 +4,4 @@
 /target/
 /target/scala-0.25/classes/
 /target/scala-0.25/test-classes/
+/.idea

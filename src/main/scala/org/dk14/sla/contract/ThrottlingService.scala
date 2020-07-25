@@ -12,7 +12,7 @@ trait ThrottlingServiceSync extends SlaServiceCachedSync:
         .map (_.rps) 
         .getOrElse(graceRps)
     val activityLevel = activityStats.countOverLastActivityWindow(token)
-    activityLevel > rps / 10
+    activityLevel < rps / 10
   
   def close(): Unit = activityStats.close()
 
