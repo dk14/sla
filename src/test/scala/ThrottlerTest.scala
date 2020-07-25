@@ -28,15 +28,19 @@ class ThrottlerTest:
 
     val nonBlocked = (0 to 8).forall(_ => throttler.isRequestAllowed(Some("aaa")))
     assertTrue("First few requests should not be blocked", nonBlocked)
+
     (0 to 8).foreach(_ => throttler.isRequestAllowed(Some("aaa")))
-    assertTrue("Requests should start getting blocked after a while", !throttler.isRequestAllowed(Some("aaa")))
+    assertTrue("Requests should start getting blocked after a while", 
+      !throttler.isRequestAllowed(Some("aaa")))
     
     as.incrementTime() //this is 100ms increment, that's why 100rps is 10rpms above
 
     val nonBlocked2 = (0 to 8).forall(_ => throttler.isRequestAllowed(Some("aaa")))
     assertTrue("round2: First few requests should not be blocked", nonBlocked2)
+
     (0 to 8).foreach(_ => throttler.isRequestAllowed(Some("aaa")))
-    assertTrue("round2: Requests should start getting blocked after a while", !throttler.isRequestAllowed(Some("aaa")))
+    assertTrue("round2: Requests should start getting blocked after a while", 
+      !throttler.isRequestAllowed(Some("aaa")))
 
 
 //-----------Performance---------------------
@@ -87,9 +91,9 @@ class ThrottlerTest:
 
     assertTrue(s"No high load: ${load}x", load > 4.0) //sanity check
 
-    //we assume null hypothesis with something around 9X% quantile, and p(x) ~ N
-    assertTrue(s"bandwith upper: $count < ${target * 1.5} ", count < target * 1.4)
-    assertTrue(s"bandwith lower: $count > ${target * 0.5} ", count > target * 0.6)
+    //we assume null hypothesis with something around 9X% quantile, and p(x) ~ Normal(target)
+    assertTrue(s"bandwith upper: $count < ${target * 1.7} ", count < target * 1.4)
+    assertTrue(s"bandwith lower: $count > ${target * 0.3} ", count > target * 0.6)
 
   @Test def overhead(): Unit =
 
@@ -119,8 +123,7 @@ class ThrottlerTest:
    * ∀ user st. st' = check_allowed(user, st) -> count(user, st') = count(user, st) + 1
    * 
    * This can be shown by randomly sampling `user`, `st`.
-   * We can also prove it by induction on `st`` 
-   * (no need for induction on `user` as it could be solved by simplification for most implementations)
+   * We can also prove it by induction/simplification on `st`` (no need for induction on `user`)
    * 
    * Below, I just show the property by example:
    */

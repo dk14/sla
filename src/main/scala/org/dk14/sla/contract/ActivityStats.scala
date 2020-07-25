@@ -2,7 +2,7 @@ package org.dk14.sla.contract
 
 trait ActivityStats:
   
-  def countOverLastActivityWindow(token: Option[String]): Int
+  def countOverActivityWindow(token: Option[String]): Int
 
   def close(): Unit
 
@@ -15,9 +15,7 @@ class ActivityStatsImpl extends ActivityStats:
   private lazy val scheduler = Executors.newScheduledThreadPool(1);
 
   import java.util.concurrent.ScheduledFuture
-
-  // GC might not be 100% happy collecting HashMap's every 100ms
-  // but it wouldn't be too unhappy either
+  
   private val reset: Runnable = new Runnable: 
     override def run (): Unit = 
       slaMap = createMap()
@@ -29,11 +27,9 @@ class ActivityStatsImpl extends ActivityStats:
 
   @volatile private var slaMap = createMap()
 
-  private def createCounter() = new AtomicInteger(0)
-
-  def countOverLastActivityWindow(token: Option[String]): Int =
+  def countOverActivityWindow(token: Option[String]): Int =
     scheduleResetOnFirstCall
-    val zero = createCounter() //lazy val + computeIfAbscent could be faster
+    val zero = new AtomicInteger(0)
     val state = Option(slaMap.putIfAbsent(token, zero)).getOrElse(zero)
     state.incrementAndGet()
 

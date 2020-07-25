@@ -8,7 +8,7 @@ class ActivityStatsMock extends ActivityStats:
 
   @volatile private var map = Map.empty[Option[String], Int]
 
-  def countOverLastActivityWindow(token: Option[String]): Int =
+  def countOverActivityWindow(token: Option[String]): Int =
     val result = map.get(token).getOrElse(0)
     map = map ++ Map(token -> (result + 1))
     result + 1
