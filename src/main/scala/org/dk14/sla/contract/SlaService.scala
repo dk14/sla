@@ -22,10 +22,11 @@ trait SlaServiceCachedSync:
     Scaffeine()
       .recordStats()
       //this wouldn't block original thread while requesting update
+      //see the docs: https://github.com/ben-manes/caffeine/wiki/Refresh
       .refreshAfterWrite(1.hour) 
       .maximumSize(100000) //amount of registered users
       .build(slaService.getSlaByToken andThen await)
 
-  //if value is not ready we'll treat user as unauthorized for few milliseconds
-  //it's very very unlikely to get blocked because of this (it would have to combine with some other bug)
+  //if value is not ready - we'll treat user as unauthorized for few milliseconds
+  //it's very very unlikely to get blocked because of this
   def getCachedSlaByToken(token:String): Option[Sla] = Option(cache.get(token))

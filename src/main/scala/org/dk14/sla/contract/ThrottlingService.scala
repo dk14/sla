@@ -6,7 +6,7 @@ trait ThrottlingServiceSync extends SlaServiceCachedSync:
   val slaService: SlaService
   val activityStats: ActivityStats
 
-  def isRequestAllowed (token: Option[String]): Boolean = 
+  def isRequestAllowed(token: Option[String]): Boolean = 
     val rps = token 
         .flatMap (getCachedSlaByToken) 
         .map (_.rps) 
