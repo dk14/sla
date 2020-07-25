@@ -16,7 +16,7 @@ trait SlaServiceCachedSync:
 
   val slaService: SlaService
 
-  private def await[T](f: Future[T]) = Await.result(f, 5.seconds)
+  private def await[T](f: Future[T]) = Await.result(f, 60.seconds)
 
   private val cache: LoadingCache[String, Sla] =
     Scaffeine()

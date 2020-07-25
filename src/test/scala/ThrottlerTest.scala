@@ -33,7 +33,7 @@ class ThrottlerTest:
   @Test def performance(): Unit =
 
     val k = 100 //rsp
-    val n = 10 //users
+    val n = 8 //users, reasonable number depends on amount of cores in your system
     val m = 10000 //requests per user
     val tsleep = 1L
     val t = m * tsleep / 1000
@@ -42,7 +42,10 @@ class ThrottlerTest:
       val graceRps: Int = 100
       val slaService = new SlaService:
         def getSlaByToken (token: String): Future[Sla] =
-          Future.successful(Sla("aaa", k))
+          Future {
+            Thread.sleep(200) //simulate slow configuration service
+            Sla("aaa", k)
+          }(ExecutionContext.global)
       val activityStats = new ActivityStatsImpl
 
     val cnt = new AtomicInteger(0)
@@ -62,11 +65,23 @@ class ThrottlerTest:
       Await.result(Future.sequence(result), Duration.Inf)
     }
 
+    //-----mesure overhead-----
+    val z = 10000
+    val start = System.currentTimeMillis()
+    (0 to z).foreach(_ => throttler.isRequestAllowed(Some((z % 100).toString)))
+    val end = System.currentTimeMillis()
+
+    val overhead = (end - start).toDouble / z
+
+    //this shows that throttling overhead is less than 0.01ms
+    assertTrue(s"Overhead $overhead ms", overhead < 0.01)
+    //------mesure overhead-----
+
     val target = k * n * t
     val count = cnt.get()
     val load = (m / t).toDouble / k
 
-    assertTrue(s"No high load: ${load}x", load > 2.0)
+    assertTrue(s"No high load: ${load}x", load > 4.0)
 
     assertTrue(s"bandwith upper: $count < ${target * 1.4} ", count < target * 1.4)
     assertTrue(s"bandwith lower: $count > ${target * 0.6} ", count > target * 0.6)
