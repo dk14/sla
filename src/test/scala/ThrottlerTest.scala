@@ -45,7 +45,7 @@ class ThrottlerTest:
 
 //-----------Performance---------------------
 
-  def createRealIshThrottler(k : Int) = new ThrottlingServiceSync:
+  def createRealIshThrottler(k: Int) = new ThrottlingServiceSync:
     val graceRps: Int = 100
     val slaService = new SlaService:
       def getSlaByToken (token: String): Future[Sla] =
@@ -55,10 +55,11 @@ class ThrottlerTest:
         }(ExecutionContext.global)
     val activityStats = new ActivityStatsImpl
 
+  //------Simulation PArameters
   val k = 100 //rsp
-  val n = 8 //users, reasonable number depends on amount of cores in your system
+  val n = 8 //number of users, reasonable number depends on amount of cores in your system
   val m = 10000 //requests per user
-  val tsleep = 1L
+  val tsleep = 1L //delay between requests
   val t = m * tsleep / 1000 //run-time in seconds
 
   /**
@@ -80,7 +81,7 @@ class ThrottlerTest:
       }(ExecutionContext.global)
     }
 
-    { //hiding implicit with braces
+    { //encapsulating implicit with braces
       implicit val ec = ExecutionContext.global
       Await.result(Future.sequence(result), Duration.Inf)
     }
@@ -91,13 +92,13 @@ class ThrottlerTest:
 
     assertTrue(s"No high load: ${load}x", load > 4.0) //sanity check
 
-    //we assume null hypothesis with something around 9X% quantile, and p(x) ~ Normal(target)
+    //we assume null hypothesis with a confidence around 95th quantile, and p(x) ~ Normal(target)
     assertTrue(s"bandwith upper: $count < ${target * 1.7} ", count < target * 1.4)
     assertTrue(s"bandwith lower: $count > ${target * 0.3} ", count > target * 0.6)
 
   @Test def overhead(): Unit =
 
-    val z = 10000
+    val z = 10000 //number of iterations
     val throttler = createRealIshThrottler(k)
 
     val start = System.currentTimeMillis()
@@ -117,13 +118,13 @@ class ThrottlerTest:
    * It's a bit boring and a bit unnecessary, given that we deal with concurrency.
    * Besides I use mocked version of activity stats.
    * 
-   * In general I'd use property based checking like scala-test for this.
+   * In general I'd use property based checking like scala-check for this.
    * I'd also make state explicit (st, st') to avoid overthinking behavioral aspects.
    * 
-   * ∀ user st. st' = check_allowed(user, st) -> count(user, st') = count(user, st) + 1
+   * ∀ user st. st' = check_request_is_allowed(user, st) -> count(user, st') = count(user, st) + 1
    * 
    * This can be shown by randomly sampling `user`, `st`.
-   * We can also prove it by induction/simplification on `st`` (no need for induction on `user`)
+   * We can also prove it by induction/simplification on `st` (no need for induction on `user`)
    * 
    * Below, I just show the property by example:
    */
