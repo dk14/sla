@@ -13,8 +13,6 @@ class ActivityStatsImpl extends ActivityStats:
   import java.util.concurrent.atomic._
   
   private lazy val scheduler = Executors.newScheduledThreadPool(1);
-
-  import java.util.concurrent.ScheduledFuture
   
   private val reset: Runnable = new Runnable: 
     override def run (): Unit = 
