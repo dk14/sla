@@ -14,7 +14,7 @@ trait ThrottlingServiceSync extends SlaServiceCachedSync:
     val activityLevel = activityStats.countOverActivityWindow(token)
     //Ideally, we'd have to use RNG when rps < 10
     // if (rps < 10 && activityLevel = 1) p(allowed) ~ Bernoulli(rps.toDouble / 10)
-    //simillar adjustments could be done to account for rounding
+    //simillar adjustments could be done to account for rounding for rps > 10
     //It's not too pragmatic though - so we won't do that:
     activityLevel < rps / 10 
   
