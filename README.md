@@ -3,7 +3,7 @@ Test assignment
 Obviously, there are lots of throttlers and load-balancers (nginx, HAProxy so on) in the wild, so I tried to not spend much time re-inventing it.
 Few years back, I already had to reinvent Guava as a test assignment: https://github.com/dk14/lifo-set.
 
-Besides, developing a and testing high quality throttler/balancer would take much more effort than appropriate for TA.
+Besides, developing and testing high quality throttler/balancer would take much more effort than appropriate for TA.
 
 Notes:
 - Just to have some fun, I decided to use scala3 (aka dotty) - so reading the code might feel a bit unusual (especially without "end" keyword).
