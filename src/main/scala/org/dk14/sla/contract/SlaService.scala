@@ -27,6 +27,6 @@ trait SlaServiceCachedSync:
       .maximumSize(100000) //amount of registered users
       .build(slaService.getSlaByToken andThen await)
 
-  //if value is not ready - we'll treat user as unauthorized for few milliseconds
-  //it's very very unlikely to get blocked because of this
-  def getCachedSlaByToken(token:String): Option[Sla] = Option(cache.get(token))
+  //if value is not ready on first request after start-up - we'll treat user as unauthorized for few milliseconds
+  //it's very very unlikely to actually throttle innocent user because of this, given that rps for unauthorized ones is much larger than per-user
+  def getCachedSlaByToken(token: String): Option[Sla] = Option(cache.get(token))
